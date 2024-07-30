@@ -1,19 +1,4 @@
 ```markdown
-# PokeApiDemo
-
-## Descrição
-
-API em C# para interagir com a PokéAPI, permitindo obter informações de Pokémon, registrar mestres Pokémon e capturas de Pokémon.
-
-## Tecnologias Usadas
-
-- **Linguagem:** C#
-- **Framework:** ASP.NET Core
-- **Banco de Dados:** SQLite
-- **ORM:** Entity Framework Core
-- **Outras Dependências:**
-  - Newtonsoft.Json
-
 ## Como Instalar e Usar
 
 ### Pré-requisitos
@@ -30,9 +15,15 @@ API em C# para interagir com a PokéAPI, permitindo obter informações de Poké
    cd PokeApiDemo
    ```
 
-2. Configure a conexão com o banco de dados no arquivo `appsettings.json`, caso necessário.
+2. Instale a ferramenta `dotnet-ef` globalmente:
 
-3. Restaure as dependências e crie o banco de dados:
+   ```bash
+   dotnet tool install --global dotnet-ef
+   ```
+
+3. Configure a conexão com o banco de dados no arquivo `appsettings.json`, caso necessário.
+
+4. Restaure as dependências e crie o banco de dados:
 
    ```bash
    dotnet restore
@@ -40,7 +31,7 @@ API em C# para interagir com a PokéAPI, permitindo obter informações de Poké
    dotnet ef database update
    ```
 
-4. Execute o projeto:
+5. Execute o projeto:
 
    ```bash
    dotnet run
