@@ -1,5 +1,3 @@
-Claro! Aqui está o README.md completo em formato Markdown:
-
 ```markdown
 # PokeApiDemo
 
