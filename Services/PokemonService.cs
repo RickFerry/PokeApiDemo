@@ -23,9 +23,14 @@ namespace PokeApiDemo.Services
                 {
                     var response = await _httpClient.GetStringAsync($"https://pokeapi.co/api/v2/pokemon/{id}/");
                     var pokemon = JsonConvert.DeserializeObject<Pokemon>(response);
-                    var spriteUrl = pokemon.Sprites.FrontDefault;
-                    pokemon.SpriteBase64 = await _fileService.GetBase64SpriteAsync(spriteUrl);
-                    pokemonList.Add(pokemon);
+                    _ = pokemon?.Sprites?.FrontDefault ?? string.Empty;
+                    if (pokemon != null)
+                    {
+                        var spriteUrl = pokemon.Sprites?.FrontDefault ?? string.Empty;
+                        pokemon.SpriteBase64 = !string.IsNullOrEmpty(spriteUrl)
+                            ? await _fileService.GetBase64SpriteAsync(spriteUrl)
+                            : string.Empty;
+                    }
                 }));
             }
 
@@ -37,9 +42,15 @@ namespace PokeApiDemo.Services
         {
             var response = await _httpClient.GetStringAsync($"https://pokeapi.co/api/v2/pokemon/{id}/");
             var pokemon = JsonConvert.DeserializeObject<Pokemon>(response);
-            var spriteUrl = pokemon.Sprites.FrontDefault;
-            pokemon.SpriteBase64 = await _fileService.GetBase64SpriteAsync(spriteUrl);
-            return pokemon;
+            _ = pokemon?.Sprites?.FrontDefault ?? string.Empty;
+            if (pokemon != null)
+            {
+                var spriteUrl = pokemon.Sprites?.FrontDefault ?? string.Empty;
+                pokemon.SpriteBase64 = !string.IsNullOrEmpty(spriteUrl)
+                    ? await _fileService.GetBase64SpriteAsync(spriteUrl)
+                    : string.Empty;
+            }
+            return pokemon ?? throw new ArgumentNullException(nameof(pokemon), "Pokemon cannot be null");
         }
 
         public async Task CapturePokemon(CapturedPokemon capturedPokemon)
