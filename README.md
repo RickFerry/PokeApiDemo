@@ -125,5 +125,3 @@ bld/
 
 This is a challenge by [Coodesh](https://coodesh.com/).
 ```
-
-Espero que isso atenda suas necessidades! Se precisar de mais alguma coisa, estou à disposição.
