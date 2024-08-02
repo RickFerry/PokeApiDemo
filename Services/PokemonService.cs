@@ -6,10 +6,6 @@ namespace PokeApiDemo.Services
 {
     public class PokemonService(HttpClient httpClient, IFileService fileService, ApplicationDbContext context) : IPokemonService
     {
-        private readonly HttpClient _httpClient = httpClient;
-        private readonly IFileService _fileService = fileService;
-        private readonly ApplicationDbContext _context = context;
-
         public async Task<IEnumerable<Pokemon>> GetRandomPokemons(int count)
         {
             var pokemonList = new List<Pokemon>();
@@ -18,18 +14,22 @@ namespace PokeApiDemo.Services
 
             for (int i = 0; i < count; i++)
             {
-                var id = random.Next(1, 1008); // Ajustar com base na quantidade de Pokémon disponíveis
+                var id = random.Next(1, 1008);
                 tasks.Add(Task.Run(async () =>
                 {
-                    var response = await _httpClient.GetStringAsync($"https://pokeapi.co/api/v2/pokemon/{id}/");
+                    var response = await httpClient.GetStringAsync($"https://pokeapi.co/api/v2/pokemon/{id}/");
                     var pokemon = JsonConvert.DeserializeObject<Pokemon>(response);
-                    _ = pokemon?.Sprites?.FrontDefault ?? string.Empty;
+                    _ = pokemon?.Sprites.FrontDefault ?? string.Empty;
                     if (pokemon != null)
                     {
-                        var spriteUrl = pokemon.Sprites?.FrontDefault ?? string.Empty;
+                        var spriteUrl = pokemon.Sprites.FrontDefault;
                         pokemon.SpriteBase64 = !string.IsNullOrEmpty(spriteUrl)
-                            ? await _fileService.GetBase64SpriteAsync(spriteUrl)
+                            ? await fileService.GetBase64SpriteAsync(spriteUrl)
                             : string.Empty;
+                        lock (pokemonList)
+                        {
+                            pokemonList.Add(pokemon);
+                        }
                     }
                 }));
             }
@@ -40,14 +40,14 @@ namespace PokeApiDemo.Services
 
         public async Task<Pokemon> GetPokemonById(int id)
         {
-            var response = await _httpClient.GetStringAsync($"https://pokeapi.co/api/v2/pokemon/{id}/");
+            var response = await httpClient.GetStringAsync($"https://pokeapi.co/api/v2/pokemon/{id}/");
             var pokemon = JsonConvert.DeserializeObject<Pokemon>(response);
-            _ = pokemon?.Sprites?.FrontDefault ?? string.Empty;
+            _ = pokemon?.Sprites.FrontDefault ?? string.Empty;
             if (pokemon != null)
             {
-                var spriteUrl = pokemon.Sprites?.FrontDefault ?? string.Empty;
+                var spriteUrl = pokemon.Sprites.FrontDefault;
                 pokemon.SpriteBase64 = !string.IsNullOrEmpty(spriteUrl)
-                    ? await _fileService.GetBase64SpriteAsync(spriteUrl)
+                    ? await fileService.GetBase64SpriteAsync(spriteUrl)
                     : string.Empty;
             }
             return pokemon ?? throw new ArgumentNullException(nameof(pokemon), "Pokemon cannot be null");
@@ -55,13 +55,13 @@ namespace PokeApiDemo.Services
 
         public async Task CapturePokemon(CapturedPokemon capturedPokemon)
         {
-            _context.CapturedPokemons.Add(capturedPokemon);
-            await _context.SaveChangesAsync();
+            context.CapturedPokemons.Add(capturedPokemon);
+            await context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<CapturedPokemon>> GetCapturedPokemons()
         {
-            return await Task.FromResult(_context.CapturedPokemons.ToList());
+            return await Task.FromResult(context.CapturedPokemons.ToList());
         }
     }
 }
